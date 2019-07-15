@@ -1,54 +1,38 @@
-import React , { Component } from 'react';
+import React, { Component } from "react";
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      error: null,
-      isLoaded: false,
-      items: []
-    };
-  }
+  state = {
+    loading: true,
+    people: []
+  };
 
-  componentDidMount() {
-    fetch("https://reqres.in/api/users?page=1")
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            isLoaded: true,
-            items: result.items
-          });
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState({
-            isLoaded: true,
-            error
-          });
-        }
-      )
+  async componentDidMount() {
+    const url = "https://reqres.in/api/users";
+    const response = await fetch(url);
+    const result = await response.json();
+    this.setState({ people: result.data, loading: false });
   }
 
   render() {
-    const { error, isLoaded, items } = this.state;
-    if (error) {
-      return <div>Error: {error.message}</div>;
-    } else if (!isLoaded) {
-      return <div>Loading...</div>;
-    } else {
-      return (
-        <ul>
-          {items.map(item => (
-            <li key={item.name}>
-              {item.name} {item.price}
-            </li>
-          ))}
-        </ul>
-      );
-    }
+    return (
+      <div>
+        {this.state.loading || !this.state.people ? (
+          <div>loading...</div>
+        ) : (
+          <div>
+            <ul>
+              {this.state.people.map((person, i) => (
+                <li key={person.first_name + person.last_name}>
+                  <img src={person.avatar} /> Name: {person.first_name}{" "}
+                  {person.last_name} | Email: {person.email}
+                </li>
+              ))}
+            </ul>
+            <div />
+          </div>
+        )}
+      </div>
+    );
   }
 }
 
